@@ -34,6 +34,8 @@ def find_ports(bus, device):
     """look into sysfs and find a device that matches given\
     bus/device ID combination, then returns the port chain it is\
     plugged on."""
+    if not bus.dirname:
+        return
     bus_id = int(bus.dirname)
     dev_id = int(device.filename)
     for dirent in os.listdir(USB_SYS_PREFIX):
@@ -88,6 +90,8 @@ class TemperDevice():
 
     def get_bus(self):
         if self._bus and hasattr(self._bus, 'dirname'):
+            if self._bus.dirname == "":
+                return ""
             return str(int(self._bus.dirname))
         else:
             return ""
