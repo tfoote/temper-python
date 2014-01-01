@@ -2,6 +2,7 @@
 from __future__ import print_function
 from temper import TemperHandler
 import getopt, sys, os.path
+from usb.core import USBError
 
 def usage():
     print("%s [-p] [-h|--help]" % os.path.basename(sys.argv[0]))
@@ -29,13 +30,16 @@ def main():
     print("Found %i devices" % len(devs))
 
     for i, dev in enumerate(devs):
-        readings.append({'device': i,
-                         'temperature_c': dev.get_temperature(),
-                         'temperature_f':
-                         dev.get_temperature(format="fahrenheit"),
-                         'ports': dev.get_ports(),
-                         'bus': dev.get_bus()
-                         })
+        try:
+            readings.append({'device': i,
+                             'temperature_c': dev.get_temperature(),
+                             'temperature_f':
+                                 dev.get_temperature(format="fahrenheit"),
+                             'ports': dev.get_ports(),
+                             'bus': dev.get_bus()
+                             })
+        except USBError as ex:
+            print('Failed to read device %s, with error [%s]. If this is access denied see README about USB permsissions.' % (i, ex))
 
     for reading in readings:
         if disp_ports:
